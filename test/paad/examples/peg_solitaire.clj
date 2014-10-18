@@ -115,7 +115,7 @@
 ;          g (goal-fn [3 3])
           g single-peg]
 ;      (let [solution (p/solve s g expand :algorithm :DF :constraint c :heuristic heuristic)]
-      (let [solution (p/solve s g expand :algorithm :A* :constraint (p/create-cheapest-path-constraint) :heuristic heuristic :limit 9.0)]
+      (let [solution (p/solve s g expand :algorithm :A* :constraint (p/cheapest-path-constraint) :heuristic heuristic :limit 9.0)]
         (print-solution solution)
         solution))))
 

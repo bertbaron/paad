@@ -49,14 +49,17 @@
      (Math/abs (- (:y state) ((:target state) 1)))))
 
 (def test-maze [" +           "
-                "## ###       "
-                " # #         "
-                "   # #     ##"
-                "#### ####### "
-                "            *"])
-
+                "#   ##       "
+                " # #      ###"
+                "   # #   #*  "
+                "###   ###### "
+                "             "])
 
 (defn do-solve []
-  (let [solution (p/solve (to-state test-maze) goal? expand
-                           :heuristic manhattan-distance)]
-    (p/get-operations (:node solution))))
+  (let [result (p/solve (to-state test-maze) goal? expand
+                           :algorithm :A*
+                           :heuristic manhattan-distance
+                           :constraint (p/cheapest-path-constraint)
+                           )]
+    (println "visited" (:visited result) "expanded" (:expanded result) "cost" (:cost (:node result)))
+    (p/get-operations (:node result))))

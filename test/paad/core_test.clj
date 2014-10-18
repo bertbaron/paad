@@ -79,7 +79,7 @@
       )))
 
 (deftest test-cheapest-path-constraint
-  (let [p ((create-cheapest-path-constraint))]
+  (let [p ((cheapest-path-constraint))]
     (testing "on-expand only"
       (is (= false (on-expand p (node :a 2))))
       (is (= true (on-expand p (node :a 2))))

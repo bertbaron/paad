@@ -70,9 +70,9 @@
                           (and (= (nw 0) (current 0))
                                (not (current 1)))))))))
 
-(defn create-cheapest-path-constraint
+(defn cheapest-path-constraint
   ([]
-    (create-cheapest-path-constraint identity))
+    (cheapest-path-constraint identity))
   ([keyfn]
     (fn []
       (CheapestPathToStateConstraint. (java.util.concurrent.ConcurrentHashMap.) keyfn))))
