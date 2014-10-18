@@ -1,6 +1,5 @@
 (ns paad.examples.sliding-puzzle
   (:require [paad.core :as p])
-  (:import [paad.core Node Step])
   (:require primitive-math))
 
 (primitive-math/use-primitive-operators)
@@ -84,14 +83,14 @@
 
 (defn get-steps [^State state]
   (do-time
-  (filter identity [(when (> (.x state) 0)                   (Step. :left  (move state -1  0) 1.0))
-                    (when (> (.y state) 0)                   (Step. :up    (move state  0 -1) 1.0))
-                    (when (< (.x state) (dec (.size state))) (Step. :right (move state  1  0) 1.0))
-                    (when (< (.y state) (dec (.size state))) (Step. :down  (move state  0  1) 1.0))]))
+  (filter identity [(when (> (.x state) 0)                   (p/step :left  (move state -1  0) 1.0))
+                    (when (> (.y state) 0)                   (p/step :up    (move state  0 -1) 1.0))
+                    (when (< (.x state) (dec (.size state))) (p/step :right (move state  1  0) 1.0))
+                    (when (< (.y state) (dec (.size state))) (p/step :down  (move state  0  1) 1.0))]))
   )
 
-(defn expand [^State state]
-  (map #(.state ^Step %) (get-steps state)))
+(defn expand [state]
+  (map #(:state %) (get-steps state)))
 
 (defn create-initial-state [^long size]
   (let [board (assoc (vec (range (* size size))) (dec (* size size)) -1)
@@ -139,13 +138,13 @@
 ;                        4 2 1)) ; 3
 
 (defn print-solution [solution]
-  (let [node ^Node (:node solution)
+  (let [node (:node solution)
         visited (:visited solution)
         expanded (:expanded solution)]
     (println "STATISTICS: visited" visited "expanded" expanded)
     (if node
       (let [ops (p/get-operations node)]
-        (println (.value node) ":" ops)
+        (println (:value node) ":" ops)
         ops)
       (do
         (println "No solution")

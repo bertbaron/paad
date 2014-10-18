@@ -1,11 +1,10 @@
 (ns paad.core
   (:require primitive-math))
 
-(deftype Step [operation state ^double cost])
+(defrecord Step [operation state ^double cost])
+(def step ->Step)
 
-(deftype Node [parent state operation ^double cost ^double value]
-  Object
-  (toString [this] (str "cost=" cost ", value=" value)))
+(defrecord Node [parent state operation ^double cost ^double value])
 
 (defprotocol Constraint
   "A possibly mutable constraint, returns true if a node is constraint, so it should not be expanded further."
@@ -194,7 +193,8 @@
         function  (if all do-solve-all do-solve)]
     (function solver)))
 
-(defn get-operations [^Node node]
-  (if-let [parent (.parent node)]
-    (conj (get-operations parent) (.operation node))
+(defn get-operations [node]
+  (if-let [parent (:parent node)]
+    (conj (get-operations parent) (:operation node))
     []))
+

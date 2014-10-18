@@ -1,6 +1,6 @@
 # paad
 
-Problem solving with search algorithms like A*
+Clojure library for problem solving with search algorithms like Depth-first, A* and IDA
 
 ## Usage
 

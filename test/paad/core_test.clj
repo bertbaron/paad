@@ -1,7 +1,6 @@
 (ns paad.core-test
   (:require [clojure.test :refer :all]
-            [paad.core :refer :all])
-  (:import [paad.core Node Step]))
+            [paad.core :refer :all]))
 
 (set! *warn-on-reflection* true)
 
@@ -16,10 +15,10 @@
 (defn tree-expand [tree]
   (fn inner-expand [keyword]
     (map-indexed
-      (fn [idx [state cost]] (Step. idx state cost)) (keyword tree))))
+      (fn [idx [state cost]] (step idx state cost)) (keyword tree))))
 
 (defn to-actual [result]
-  (map #(vector (.state ^Node (:node %)) (.cost ^Node (:node %))) result))
+  (map #(vector (:state (:node %)) (:cost (:node %))) result))
 
 (defn test-solve-all [tree expected & {:keys [constraint limit] :as options}]
   (doseq [algorithm [:A* :BF :IDA* :DF]]
@@ -67,7 +66,7 @@
 
 ;parent state operation ^double cost ^double value
 (defn node [state value]
-  (Node. nil state  nil 0 value))
+  (->Node nil state  nil 0 value))
 
 (deftest concurrent-replace-test
   (let [concurrent-replace (ns-resolve 'paad.core 'concurrent-replace)

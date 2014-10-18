@@ -1,6 +1,6 @@
 (ns paad.examples.peg-solitaire
   (:require [paad.core :as p])
-  (:import [paad.core Node Step]))
+  (:import [paad.core Node]))
 
 (set! *warn-on-reflection* true)
 
@@ -79,7 +79,7 @@
           :when isvalid]
       (do
 ;        (println "Expanding " [position direction cost])
-        (Step. [position direction] (cannonical (State. newpositions new-position)) cost)))))
+        (p/step [position direction] (cannonical (State. newpositions new-position)) cost)))))
 
 ;(defn create-constraint
 ;  "A constraint that filters out duplicate states"

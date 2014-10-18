@@ -1,12 +1,11 @@
 (ns paad.performance
-  (:require [paad.core :as p])
-  (:import [paad.core Node Step]))
+  (:require [paad.core :as p]))
 
 (set! *warn-on-reflection* true)
 
 (defn full-tree-test [algorithm width limit]
   (let [g (constantly false)
-        steps (vec (map (fn [_] (Step. :op :state 1)) (range width)))
+        steps (vec (map (fn [_] (p/step :op :state 1)) (range width)))
         expand (constantly steps)]
     (p/solve :state g expand :algorithm algorithm :limit limit)))
 

@@ -10,4 +10,5 @@ pom.xml.asc
 /.project
 /.settings
 /.classpath
-bin
+/bin
+/lib
