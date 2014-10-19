@@ -108,8 +108,17 @@
 (defn- merge-result [old new]
   (merge new (apply (partial merge-with #(+ % %2)) (map #(select-keys % [:visited :expanded]) [old new]))))
 
+(defn- node-2-solution [node]
+  (if node
+    (conj (node-2-solution (:parent node)) (select-keys node [:operation :state :cost]))
+    []))
+
 (defn- create-public-result [result]
-  (select-keys result [:node :visited :expanded]))
+  (let [stats    (select-keys result [:visited :expanded])
+        solution (if-let [node (:node result)]
+                   (node-2-solution node)
+                   nil)]
+    {:statistics stats :solution solution}))
 
 (defn- expand-node [^Node node h-fn ^Step step]
   (let [new-state (.state step) #_(apply-fn (.state node) (.operation step))
@@ -192,9 +201,3 @@
                                                           (str "Unknown algorithm: " algorithm ", supperted are: [:A* :IDA* :DF]"))))
         function  (if all do-solve-all do-solve)]
     (function solver)))
-
-(defn get-operations [node]
-  (if-let [parent (:parent node)]
-    (conj (get-operations parent) (:operation node))
-    []))
-

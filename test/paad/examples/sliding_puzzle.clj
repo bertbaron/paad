@@ -119,17 +119,17 @@
 (def s (create-initial-state 4))
 (def t (shuffle-state s 200))
 
-(def test-state (State. [ 4  13   5  11
-                          2   0   8   3
-                         10   1  12   7
-                         14  -1   6   9]
-                        4 1 3)) ; 50
+;(def test-state (State. [ 4  13   5  11
+;                          2   0   8   3
+;                         10   1  12   7
+;                         14  -1   6   9]
+;                        4 1 3)) ; 50
 
-;(def test-state (State. [   2  12   0   1 
-;                            4  11   6   3 
-;                           -1  13   8  10 
-;                            5   9  14   7] 
-;                        4 0 2)) ; 40
+(def test-state (State. [   2  12   0   1 
+                            4  11   6   3 
+                           -1  13   8  10 
+                            5   9  14   7] 
+                        4 0 2)) ; 40
 
 ;(def test-state (State. [  0   1   2   3 
 ;                           4   5  -1   6 
@@ -137,14 +137,12 @@
 ;                          12  13  14  11 ]
 ;                        4 2 1)) ; 3
 
-(defn print-solution [solution]
-  (let [node (:node solution)
-        visited (:visited solution)
-        expanded (:expanded solution)]
-    (println "STATISTICS: visited" visited "expanded" expanded)
-    (if node
-      (let [ops (p/get-operations node)]
-        (println (:value node) ":" ops)
+(defn print-solution [result]
+  (let [solution (:solution result)]
+    (println "STATISTICS:" (:statistics result))
+    (if solution
+      (let [ops (map :operation (rest solution))]
+        (println (-> solution last :cost) ":" ops)
         ops)
       (do
         (println "No solution")

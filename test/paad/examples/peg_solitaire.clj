@@ -1,6 +1,5 @@
 (ns paad.examples.peg-solitaire
-  (:require [paad.core :as p])
-  (:import [paad.core Node]))
+  (:require [paad.core :as p]))
 
 (set! *warn-on-reflection* true)
 
@@ -74,35 +73,24 @@
     (for [position  positions
           direction [:up :down :left :right]
           :let [[isvalid new-position newpositions] (move positions position direction)
-                cost (if (= (:last-dest state) position) 0 1)
-                cost (if (= (count newpositions) 1) (+ cost 1) cost)] ; Inrease cost for last step with 1 to make heuristic admissable
+                cost 1]
+;                cost (if (= (:last-dest state) position) 0 1)
+;                cost (if (= (count newpositions) 1) (+ cost 1) cost)] ; Inrease cost for last step with 1 to make heuristic admissable
           :when isvalid]
       (do
-;        (println "Expanding " [position direction cost])
         (p/step [position direction] (cannonical (State. newpositions new-position)) cost)))))
 
-;(defn create-constraint
-;  "A constraint that filters out duplicate states"
-;  []
-;  (let [cache (java.util.HashSet.)]
-;    (fn constraint [^Node node]
-;      (let [added (.add cache (cannonical (.state node)))]
-;        (when (and added (= (rem (.size cache) 1000) 0)) (println "." (.size cache)))
-;        (not added)))))
-
-(defn print-solution [solution]
-  (if (:node solution)
-    (letfn [(print-path [^Node node mark]
-              (when-let [parent (.parent node)]
-                (print-path parent ((.operation node) 0)))
-              (print-state (.state node) mark)
-              (println))]
-      (print-path (:node solution) nil))
-    (println "No solution:" solution)))
+(defn print-solution [result]
+  (if-let [solution (:solution result)]
+    (doseq [elem (rest solution)]
+      (print-state (:state elem) ((:operation elem) 0))
+      (println))
+    (println "No solution:" result)))
     
 (defn single-peg [state]
   (= 1 (count (:positions state))))
 
+; when cost are calculated in number of runs with a single pin
 (defn heuristic [state]
   (/ (dec (count (:positions state))) 100))
 
@@ -114,8 +102,8 @@
     (let [s (create-state position)
 ;          g (goal-fn [3 3])
           g single-peg]
-;      (let [solution (p/solve s g expand :algorithm :DF :constraint c :heuristic heuristic)]
-      (let [solution (p/solve s g expand :algorithm :A* :constraint (p/cheapest-path-constraint) :heuristic heuristic :limit 9.0)]
+      (let [solution (p/solve s g expand :algorithm :DF :constraint (p/cheapest-path-constraint))]
+;      (let [solution (p/solve s g expand :algorithm :IDA* :constraint (p/cheapest-path-constraint) :heuristic heuristic)]
         (print-solution solution)
         solution))))
 

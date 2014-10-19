@@ -18,7 +18,7 @@
       (fn [idx [state cost]] (step idx state cost)) (keyword tree))))
 
 (defn to-actual [result]
-  (map #(vector (:state (:node %)) (:cost (:node %))) result))
+  (map #(vector (:state (last (:solution %))) (:cost (last (:solution %)))) result))
 
 (defn test-solve-all [tree expected & {:keys [constraint limit] :as options}]
   (doseq [algorithm [:A* :BF :IDA* :DF]]
@@ -31,7 +31,7 @@
 (defn test-statistics [tree algorithm expected & {:keys [constraint] :as options}]
   (testing (str algorithm " statistics for " tree)
     (let [result (mapply solve :a is-goal (tree-expand tree) :algorithm algorithm options)]
-      (is (= expected (select-keys result [:visited :expanded]))))))
+      (is (= expected (:statistics result))))))
 
 (deftest simple-test
   (let [graph {:a [[:b 1] [:c 1]] 

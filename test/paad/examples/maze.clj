@@ -61,5 +61,5 @@
                            :heuristic manhattan-distance
                            :constraint (p/cheapest-path-constraint)
                            )]
-    (println "visited" (:visited result) "expanded" (:expanded result) "cost" (:cost (:node result)))
-    (p/get-operations (:node result))))
+    (println (:statistics result) (-> result :solution last :cost))
+    (map :operation (rest (:solution result)))))

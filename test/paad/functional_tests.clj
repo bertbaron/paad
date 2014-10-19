@@ -4,9 +4,9 @@
   (:require [paad.examples.sliding-puzzle :as sp]))
 
 (defn assert-result [cost expanded visited result]
-  (is (= cost     (.cost (:node result))))
-  (is (= expanded (:expanded result)))
-  (is (= visited  (:visited result))))
+  (is (= cost     (-> result :solution last :cost)))
+  (is (= expanded (-> result :statistics :expanded)))
+  (is (= visited  (-> result :statistics :visited))))
          
 (deftest eight-puzzle
   (let [s (sp/create-state [[-1  3  4] 
