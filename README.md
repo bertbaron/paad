@@ -117,6 +117,25 @@ The number of nodes at depth 10 is therefore 4^10=1048576.
 It is almost always necessary to reduce the size of the search tree in order to be able to solve
 slightly more complex problems.  
 
+#### using heuristics
+
+The most obvious and powerful way to reduce the search space when using A\* or IDA\* is is of course the *heuristic function*.
+
+For our problem a admissible heuristic could be the distance from each element to its target position,
+divided by 2, since each step will only move two elements by one position each:
+
+    (defn heuristic [^java.util.List state]
+      (let [target ^java.util.List (sort state)
+            displacement (reduce + (for [item state]
+                                     (Math/abs (- (.indexOf state item)
+                                                  (.indexOf target item)))))]
+        (/ displacement 2)))
+
+    (:statistics (p/solve [5 4 3 2 1] goal? expand
+                          :heuristic heuristic))
+    
+    > {:expanded 1676, :visited 419} 
+
 #### Using constraints
 
 The easiest way to reduce the size of the tree is by trying to see if one of the provided constraints
@@ -172,24 +191,24 @@ the number of unique states however.
 By default, equals is used for comparing states. It is also possible to provide a key function that
 calculates the key from the state.
 
-#### using heuristics
+### Finding all solutions
 
-The most obvious and powerful way to reduce the search space when using A\* or IDA\* is is of course the *heuristic function*.
+It is also possible to find all solutions for a problem, by specifying ```:all true```. Instead
+of a single result, a lazy sequence of the result is returned:
 
-For our problem a admissible heuristic could be the distance from each element to its target position,
-divided by 2, since each step will only move two elements by one position each:
+    (map p/get-operations (take 5 (p/solve [5 1 3 2 4] goal? expand
+                                           :algorithm :A*
+                                           :all true)))
 
-    (defn heuristic [^java.util.List state]
-      (let [target ^java.util.List (sort state)
-            displacement (reduce + (for [item state]
-                                     (Math/abs (- (.indexOf state item)
-                                                  (.indexOf target item)))))]
-        (/ displacement 2)))
+    > ((0 2 1 2 3) (0 1 2 3 1) (2 0 1 2 3) (0 1 2 1 3) (2 0 0 0 1 2 3))
 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand
-                          :heuristic heuristic))
-    
-    > {:expanded 1676, :visited 419} 
+The sequence is really lazy, the head will not be calculated until requested
+and chunking is not supported. 
+
+This option is not supported for IDA*. It it is used in combination with
+IDA*, the sequence will contain only one result.
+
+Note that any constraint is respected.
 
 ## License
 
