@@ -42,27 +42,63 @@ extract the required information is quite simple. For example, to just list the 
 (the indices of the left element of the swap in our example), use the following in the repl:
 (where *1, the last result, is assumed to contain the result): 
 
-    (map :operation (rest (:solution *1)))
+    (p/get-operations *1)
 
     > (0 2 1 2 3)
 
 ### Choosing the algorithm
 
-By default *A*** is used to solve the problem. To use an other algorithm, simply specify it
-using the :algorithm key:
+#### A*
+ 
+By default *A*** is used to solve the problem. It can also explicitly be specified using
+the :algorithm key:
 
-    (p/solve [5 1 3 2 4] goal? expand
-             :algorithm :BF)
+    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                               :algorithm :A*))
     
-    >  {:statistics {:expanded 1776, :visited 444},
-       :solution
-       [{:cost 0.0, :state [5 1 3 2 4], :operation nil}
-        ...
-        {:cost 5.0, :state [1 2 3 4 5], :operation 3}]}    
+    > (0 2 1 2 3)   
 
-In this case it seems that Breadth-first search results in fewer nodes expanded and visited.
-This is because A* will behave similar to Breadth-first in case no heuristic is provided and
-the costs for each step is the same.
+A* will find the optimal solution in the least number of visited nodes is an admissible
+heuristic is provided. The *heuristic function* estimates the remaining costs to reach
+the goal for a given state. An admissible heuristic is a heuristic that never over-estimates
+the actual costs of the best solution.
+
+Since A* keeps all nodes in memory, it may run out of memory before a solution has been
+found
+
+#### IDA*
+
+Iterative Deepening A*. Returns the optimal solution like A*, but uses
+very little memory by using a depth first search in iterations with increasing limit. Works very well when the costs increase in discrete steps along the path.
+
+    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                               :algorithm :IDA*))
+
+    > (2 0 1 2 3)
+    
+#### Depth First
+
+Explores as far as possible along each branch before backtracking. Will not guarantee to
+find the optimal solution. Requires very little memory (linear in the deepest path).
+
+A limit can be provided to avoid that the search is expanding into depth forever.
+
+    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                               :algorithm :DF
+                               :limit 8))
+
+    > (3 3 2 0 1 2 3)
+
+#### Breadth First
+
+Expands all nodes at a specific depth before going to the next
+depth. Will find the optimal solution if the shortest path is the optimal solution.
+Requires a lot of memory. It is almost always better to use A* or IDA*.
+
+    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                               :algorithm :BF))
+                                  
+    > (0 1 2 1 3)
 
 ### Tuning
 
@@ -107,7 +143,7 @@ always pays off to use it if applicable.
 ##### no-loop-constraint
 
 Not only swapping the same element twice will result in a previous state. Consider the case where
-we make the swaps 0, 2, 0, 2. This will also result in a previous state. Loops like these can be cut
+we make the swaps (0 2 0 2). This will also result in a previous state. Loops like these can be cut
 of with the no-loop-constraint:
 
     (:statistics (p/solve [5 4 3 2 1] goal? expand
@@ -121,7 +157,8 @@ any effect, for example when a good heuristic is provided.
 ##### cheapest-path-constraint
 
 Finally the library provides a constraint that detects if a state is reached via multiple paths, and
-only continues with the best path to that state:
+only continues with the best path to that state. This will for example detect that (0 2) and (2 0)
+lead to the same state and continue with only one of them:
 
     (:statistics (p/solve [5 4 3 2 1] goal? expand
                           :constraint (p/cheapest-path-constraint)))
@@ -132,25 +169,27 @@ This constraint basically turns the search tree into an actual graph of unique s
 for problems where the number of unique states is limited. The memory consumption is linear in
 the number of unique states however.
 
+By default, equals is used for comparing states. It is also possible to provide a key function that
+calculates the key from the state.
+
 #### using heuristics
 
+The most obvious and powerful way to reduce the search space when using A\* or IDA\* is is of course the *heuristic function*.
 
+For our problem a admissible heuristic could be the distance from each element to its target position,
+divided by 2, since each step will only move two elements by one position each:
 
-## Algorithms
+    (defn heuristic [^java.util.List state]
+      (let [target ^java.util.List (sort state)
+            displacement (reduce + (for [item state]
+                                     (Math/abs (- (.indexOf state item)
+                                                  (.indexOf target item)))))]
+        (/ displacement 2)))
 
-The following algorithms are provided by the library:
-
-* **Depth first** explores as far as possible along each branch before backtracking.
-  Will not guarantee to find the optimal solution. 
-  Requires very little memory (linear in the deepest path). 
-* **A*** 
-* **IDA*** Iterative Deepening A*. Returns the optimal solution like A*, but uses
-  very little memory by using a depth first search in iterations. Works very well
-  when the costs increase in discrete steps along the path.
-* **Breadth first** Expands all nodes at a specific depth before going to the next
-  depth. Will find the optimal solution if the shortest path is the optimal solution.
-  Requires a lot of memory. It is almost always better to use A* or IDA*.
+    (:statistics (p/solve [5 4 3 2 1] goal? expand
+                          :heuristic heuristic))
     
+    > {:expanded 1676, :visited 419} 
 
 ## License
 

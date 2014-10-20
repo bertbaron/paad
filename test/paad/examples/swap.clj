@@ -21,11 +21,11 @@
 (defn goal? [state]
   (= state (sort state)))
 
-(defn goal [target]
+(defn get-goal [target]
   (fn [state]
     (= state target)))
 
-(defn heuristic [target]
+(defn get-heuristic [target]
   (let [; pre-calculate map from element to index in target vector
         indices (->> target (map-indexed vector) (map reverse) (map vec) (into {}))]
 	  (fn [state]
@@ -41,11 +41,12 @@
 ;		                                 (Math/abs (- (.indexOf state item) (.indexOf target item)))))]
 ;		    (/ displacement 2)))))
 
-(defn old-heuristic [target]
-  (fn heuristic [state]
-    (let [displacement (reduce + (for [item state]
-                                   (Math/abs (- (.indexOf ^java.util.List state item) (.indexOf ^java.util.List target item)))))]
-      (/ displacement 2))))
+(defn heuristic [^java.util.List state]
+  (let [target ^java.util.List (sort state)
+        displacement (reduce + (for [item state]
+                                 (Math/abs (- (.indexOf state item)
+                                              (.indexOf target item)))))]
+    (/ displacement 2)))
 
 ;(clojure.pprint/pprint (p/solve [5 4 3 2 1] goal? expand)) 
 
@@ -54,8 +55,8 @@
 
 (defn do-solve [state]
   (let [target (sort state)
-        h-fn   (heuristic target)
-        g-fn   (goal target)]
+        h-fn   (get-heuristic target)
+        g-fn   (get-goal target)]
     (:statistics (p/solve state g-fn expand
                           :heuristic h-fn
 ;             :constraint (p/cheapest-path-constraint)

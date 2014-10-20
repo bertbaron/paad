@@ -201,3 +201,6 @@
                                                           (str "Unknown algorithm: " algorithm ", supperted are: [:A* :IDA* :DF]"))))
         function  (if all do-solve-all do-solve)]
     (function solver)))
+
+(defn get-operations [result]
+  (->> result :solution rest (map :operation)))
