@@ -187,7 +187,7 @@
           (cons (create-public-result result) (do-solve-all (:next-solver result))))))))
 
 (defn solve [root-state goal-fn expand-fn & {:keys [algorithm heuristic limit constraint all]
-                                             :or {algorithm  :IDA*
+                                             :or {algorithm  :A*
                                                   heuristic  (constantly 0.0)
                                                   limit      Double/POSITIVE_INFINITY
                                                   constraint (no-constraint)
