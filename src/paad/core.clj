@@ -202,5 +202,14 @@
         function  (if all do-solve-all do-solve)]
     (function solver)))
 
-(defn get-operations [result]
-  (->> result :solution rest (map :operation)))
+(defn get-operations
+  "Returns a lazy sequence of operations from the result, or nil if there is no solution"
+  [result]
+  (if (:solution result)
+    (->> result :solution rest (map :operation))))
+
+(defn get-states
+  "Returns a lazy sequence of states from root to goal, or nil if there is no solution"
+  [result]
+  (if (:solution result)
+    (->> result :solution (map :state))))

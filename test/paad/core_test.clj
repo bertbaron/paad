@@ -94,4 +94,23 @@
      (is (= true  (on-visit  p (node :b 1))))
      )
       ))
-    
+
+(deftest get-operations-test
+  (testing "get-operations"
+    (is (= '(1 0) (get-operations (solve :a is-goal (tree-expand {:a [[:b 1] [:c 1]] 
+                                                                  :c [[:D 1]]})))))
+    (is (= '() (get-operations (solve :A is-goal (tree-expand {:A [[:b 1] [:c 1]] 
+                                                               :c [[:D 1]]})))))
+    (is (= nil (get-operations (solve :a is-goal (tree-expand {:a [[:b 1] [:c 1]] 
+                                                               :c [[:d 1]]})))))
+    ))
+
+(deftest get-states-test
+  (testing "get-states"
+    (is (= '(:a :c :D) (get-states (solve :a is-goal (tree-expand {:a [[:b 1] [:c 1]] 
+                                                                   :c [[:D 1]]})))))
+    (is (= '(:A) (get-states (solve :A is-goal (tree-expand {:A [[:b 1] [:c 1]] 
+                                                             :c [[:D 1]]})))))
+    (is (= nil (get-states (solve :a is-goal (tree-expand {:a [[:b 1] [:c 1]] 
+                                                           :c [[:d 1]]})))))
+    ))

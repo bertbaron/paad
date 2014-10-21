@@ -1,11 +1,11 @@
 # paad
 
-Clojure library for problem solving with search algorithms like Depth-first, A* and IDA
+Clojure library for problem solving with search algorithms like Depth-first, A\* and IDA\*
 
 ## Usage
 
 As an example we will sort a vector of elements with the minimal number of swaps
-of neighbouring elements:
+of neighboring elements:
 
     (ns paad.examples.swaps
       (:require [paad.core :as p]))
@@ -33,14 +33,17 @@ of neighbouring elements:
         {:cost 4.0, :state [1 2 3 5 4], :operation 2}
         {:cost 5.0, :state [1 2 3 4 5], :operation 3}]}
 
+The expand function returns the child states together with the operation that was applied
+and the cost of the step. The operation is not used by the framework but is included in
+the result.
+
 The result contains statistics that show how many nodes have been expanded and how many 
 nodes have been visited by the algorithm. This can be quite useful during tuning.
 
 The solution contains the complete path from initial state to goal state, with the applied
-operation and total cost to reach the state. This is typically more than needed, but to
+operation and total cost to reach each state. This is typically more than needed, but to
 extract the required information is quite simple. For example, to just list the operations
 (the indices of the left element of the swap in our example), use the following in the repl:
-(where *1, the last result, is assumed to contain the result): 
 
     (p/get-operations *1)
 
@@ -115,13 +118,13 @@ has exponential performance, and in case of A* also memory usage. Every state ex
 The number of nodes at depth 10 is therefore 4^10=1048576.
 
 It is almost always necessary to reduce the size of the search tree in order to be able to solve
-slightly more complex problems.  
+slightly more complex problems. 
 
 #### using heuristics
 
 The most obvious and powerful way to reduce the search space when using A\* or IDA\* is is of course the *heuristic function*.
 
-For our problem a admissible heuristic could be the distance from each element to its target position,
+For our problem an admissible heuristic could be the distance from each element to its target position,
 divided by 2, since each step will only move two elements by one position each:
 
     (defn heuristic [^java.util.List state]
@@ -212,6 +215,6 @@ Note that any constraint is respected.
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014
 
 Distributed under the Eclipse Public License version 1.0
