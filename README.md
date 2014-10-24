@@ -7,31 +7,35 @@ Clojure library for problem solving with search algorithms like Depth-first, A\*
 As an example we will sort a vector of elements with the minimal number of swaps
 of neighboring elements:
 
-    (ns paad.examples.swaps
-      (:require [paad.core :as p]))
+```clojure
+(ns paad.examples.swaps
+  (:require [paad.core :as p]))
 
-    (defn swap
-      "Swaps element at index i in vector v with its right neighbour"
-      [v i]
-      (assoc v i (v (inc i)) (inc i) (v i)))
+(defn swap
+  "Swaps element at index i in vector v with its right neighbour"
+  [v i]
+  (assoc v i (v (inc i)) (inc i) (v i)))
 
-    (defn expand [state]
-      (for [i (range 0 (dec (count state)))]
-        (p/step i (swap state i) 1.0)))
+(defn expand [state]
+  (for [i (range 0 (dec (count state)))]
+    (p/step i (swap state i) 1.0)))
 
-    (defn goal? [state]
-      (= state (sort state)))
+(defn goal? [state]
+  (= state (sort state)))
 
-    (p/solve [5 1 3 2 4] goal? expand) 
-
-    > {:statistics {:expanded 2628, :visited 657},
-       :solution
-       [{:cost 0.0, :state [5 1 3 2 4], :operation nil}
-        {:cost 1.0, :state [1 5 3 2 4], :operation 0}
-        {:cost 2.0, :state [1 5 2 3 4], :operation 2}
-        {:cost 3.0, :state [1 2 5 3 4], :operation 1}
-        {:cost 4.0, :state [1 2 3 5 4], :operation 2}
-        {:cost 5.0, :state [1 2 3 4 5], :operation 3}]}
+(p/solve [5 1 3 2 4] goal? expand) 
+```
+results in:
+```clojure
+{:statistics {:expanded 2628, :visited 657},
+ :solution
+ [{:cost 0.0, :state [5 1 3 2 4], :operation nil}
+  {:cost 1.0, :state [1 5 3 2 4], :operation 0}
+  {:cost 2.0, :state [1 5 2 3 4], :operation 2}
+  {:cost 3.0, :state [1 2 5 3 4], :operation 1}
+  {:cost 4.0, :state [1 2 3 5 4], :operation 2}
+  {:cost 5.0, :state [1 2 3 4 5], :operation 3}]}
+```
 
 The expand function returns the child states together with the operation that was applied
 and the cost of the step. The operation is not used by the framework but is included in
@@ -45,9 +49,10 @@ operation and total cost to reach each state. This is typically more than needed
 extract the required information is quite simple. For example, to just list the operations
 (the indices of the left element of the swap in our example), use the following in the repl:
 
-    (p/get-operations *1)
-
-    > (0 2 1 2 3)
+```clojure
+> (p/get-operations *1)
+(0 2 1 2 3)
+```
 
 ### Choosing the algorithm
 
@@ -56,10 +61,11 @@ extract the required information is quite simple. For example, to just list the 
 By default *A*** is used to solve the problem. It can also explicitly be specified using
 the :algorithm key:
 
-    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
-                               :algorithm :A*))
-    
-    > (0 2 1 2 3)   
+```clojure
+> (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                             :algorithm :A*))
+(0 2 1 2 3)   
+```
 
 A* will find the optimal solution in the least number of visited nodes is an admissible
 heuristic is provided. The *heuristic function* estimates the remaining costs to reach
@@ -74,10 +80,11 @@ found
 Iterative Deepening A*. Returns the optimal solution like A*, but uses
 very little memory by using a depth first search in iterations with increasing limit. Works very well when the costs increase in discrete steps along the path.
 
-    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
-                               :algorithm :IDA*))
-
-    > (2 0 1 2 3)
+```clojure
+> (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                             :algorithm :IDA*))
+(2 0 1 2 3)
+```
     
 #### Depth First
 
@@ -86,11 +93,12 @@ find the optimal solution. Requires very little memory (linear in the deepest pa
 
 A limit can be provided to avoid that the search is expanding into depth forever.
 
-    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
-                               :algorithm :DF
-                               :limit 8))
-
-    > (3 3 2 0 1 2 3)
+```clojure
+> (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                             :algorithm :DF
+                             :limit 8))
+(3 3 2 0 1 2 3)
+```
 
 #### Breadth First
 
@@ -98,10 +106,11 @@ Expands all nodes at a specific depth before going to the next
 depth. Will find the optimal solution if the shortest path is the optimal solution.
 Requires a lot of memory. It is almost always better to use A* or IDA*.
 
-    (p/get-operations (p/solve [5 1 3 2 4] goal? expand
-                               :algorithm :BF))
-                                  
-    > (0 1 2 1 3)
+```clojure
+> (p/get-operations (p/solve [5 1 3 2 4] goal? expand
+                             :algorithm :BF))
+(0 1 2 1 3)
+```
 
 ### Tuning
 
@@ -109,9 +118,10 @@ We now have a program that can solve our problem and this may be all we need. Ho
 expect to solve the problem for larger input vectors we may run into trouble. Even other
 vectors of length 5 will already show this:
 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand))  
-
-    > {:expanded 1399388, :visited 349847}
+```clojure
+> (:statistics (p/solve [5 4 3 2 1] goal? expand))  
+{:expanded 1399388, :visited 349847}
+```
     
 That seems like a huge number of nodes for such a small input. The reason is that the algorithm
 has exponential performance, and in case of A* also memory usage. Every state expands to 4 child-states.
@@ -127,17 +137,21 @@ The most obvious and powerful way to reduce the search space when using A\* or I
 For our problem an admissible heuristic could be the distance from each element to its target position,
 divided by 2, since each step will only move two elements by one position each:
 
-    (defn heuristic [^java.util.List state]
-      (let [target ^java.util.List (sort state)
-            displacement (reduce + (for [item state]
-                                     (Math/abs (- (.indexOf state item)
-                                                  (.indexOf target item)))))]
-        (/ displacement 2)))
+```clojure
+> (defn heuristic [^java.util.List state]
+    (let [target ^java.util.List (sort state)
+          displacement (reduce + (for [item state]
+                                   (Math/abs (- (.indexOf state item)
+                                                (.indexOf target item)))))]
+      (/ displacement 2)))
+#user/test
+> (:statistics (p/solve [5 4 3 2 1] goal? expand
+                        :heuristic heuristic))
+{:expanded 1676, :visited 419} 
+```
+> NOTE: For simplicity we assume that the state does not contain duplicates. This heuristic will not be
+> admissible if it does!
 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand
-                          :heuristic heuristic))
-    
-    > {:expanded 1676, :visited 419} 
 
 #### Using constraints
 
@@ -149,11 +163,12 @@ is suitable for the problem.
 Analyzing our problem domain, it is clear that it makes no sense to swap the same elements twice after
 each other, since we will return to original state. This is what the '''no-return-constraint''' does,
 it cuts the branch if an operation of a state returns in the same state or in the parent state.
- 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand
-                          :constraint (p/no-return-constraint)))
 
-    > {:expanded 118357, :visited 39452}
+```clojure
+> (:statistics (p/solve [5 4 3 2 1] goal? expand
+                          :constraint (p/no-return-constraint)))
+{:expanded 118357, :visited 39452}
+```
 
 This saves an order of magnitude, since every expand will now effectively result in 3 child states
 instead of four. This means we should now be able to compute vectors with one more element at the
@@ -168,10 +183,11 @@ Not only swapping the same element twice will result in a previous state. Consid
 we make the swaps (0 2 0 2). This will also result in a previous state. Loops like these can be cut
 of with the no-loop-constraint:
 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand
-                          :constraint (p/no-loop-constraint)))
-
-    > {:expanded 78843, :visited 28439}
+```clojure
+> (:statistics (p/solve [5 4 3 2 1] goal? expand
+                        :constraint (p/no-loop-constraint)))
+{:expanded 78843, :visited 28439}
+```
 
 This constraint is somewhat more costly than the no-return-constraint, and in some cases it barely has
 any effect, for example when a good heuristic is provided.
@@ -182,10 +198,11 @@ Finally the library provides a constraint that detects if a state is reached via
 only continues with the best path to that state. This will for example detect that (0 2) and (2 0)
 lead to the same state and continue with only one of them:
 
-    (:statistics (p/solve [5 4 3 2 1] goal? expand
-                          :constraint (p/cheapest-path-constraint)))
-
-    > {:expanded 119, :visited 119}
+```clojure
+> (:statistics (p/solve [5 4 3 2 1] goal? expand
+                        :constraint (p/cheapest-path-constraint)))
+{:expanded 119, :visited 119}
+```
     
 This constraint basically turns the search tree into an actual graph of unique states. It works perfectly
 for problems where the number of unique states is limited. The memory consumption is linear in
@@ -199,11 +216,12 @@ calculates the key from the state.
 It is also possible to find all solutions for a problem, by specifying ```:all true```. Instead
 of a single result, a lazy sequence of the result is returned:
 
-    (map p/get-operations (take 5 (p/solve [5 1 3 2 4] goal? expand
-                                           :algorithm :A*
-                                           :all true)))
-
-    > ((0 2 1 2 3) (0 1 2 3 1) (2 0 1 2 3) (0 1 2 1 3) (2 0 0 0 1 2 3))
+```clojure
+> (map p/get-operations (take 5 (p/solve [5 1 3 2 4] goal? expand
+                                         :algorithm :A*
+                                         :all true)))
+((0 2 1 2 3) (0 1 2 3 1) (2 0 1 2 3) (0 1 2 1 3) (2 0 0 0 1 2 3))
+```
 
 The sequence is really lazy, the head will not be calculated until requested
 and chunking is not supported. 
