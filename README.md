@@ -144,7 +144,7 @@ divided by 2, since each step will only move two elements by one position each:
                                    (Math/abs (- (.indexOf state item)
                                                 (.indexOf target item)))))]
       (/ displacement 2)))
-#user/test
+#user/heuristic
 > (:statistics (p/solve [5 4 3 2 1] goal? expand
                         :heuristic heuristic))
 {:expanded 1676, :visited 419} 
