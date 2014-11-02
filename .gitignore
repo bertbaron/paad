@@ -12,3 +12,4 @@ pom.xml.asc
 /.classpath
 /bin
 /lib
+/resources/public/js/*
