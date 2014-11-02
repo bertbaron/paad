@@ -1,10 +1,9 @@
-(ns paad.core
-  (:require primitive-math))
+(ns paad.core)
 
-(defrecord Step [operation state ^double cost])
+(defrecord Step [operation state ^number cost])
 (def step ->Step)
 
-(defrecord Node [parent state operation ^double cost ^double value])
+(defrecord Node [parent state operation ^number cost ^number value])
 
 (defprotocol Constraint
   "A possibly mutable constraint, returns true if a node is constraint, so it should not be expanded further."
@@ -59,14 +58,14 @@
                       (keyfn (.state ^Node node))
                       [(.value ^Node node) false]
                       (fn [current nw]
-                        (< ^double (nw 0) ^double (current 0))))))
+                        (< ^number (nw 0) ^number (current 0))))))
 
   (on-visit [_ node]
     (not (cond-update map
                       (keyfn (.state ^Node node))
                       [(.value ^Node node) true]
                       (fn [current nw]
-                        (or (< ^double (nw 0) ^double (current 0))
+                        (or (< ^number (nw 0) ^number (current 0))
                           (and (= (nw 0) (current 0))
                                (not (current 1)))))))))
 
@@ -123,16 +122,16 @@
 (defn- expand-node [^Node node h-fn ^Step step]
   (let [new-state (.state step) #_(apply-fn (.state node) (.operation step))
         new-cost  (+ (.cost node) (.cost step))
-        new-value (max (.value node) (+ new-cost ^double (h-fn new-state)))]
+        new-value (max (.value node) (+ new-cost ^number (h-fn new-state)))]
     (Node. node new-state (.operation step) new-cost new-value)))
 
 (defn- general-search [state expand-fn h-fn constraint goal-fn the-limit]
-  (let [limit ^double the-limit]
+  (let [limit ^number the-limit]
     (loop [queue          (:strategy state)
            contour        (Double/POSITIVE_INFINITY)
            visited        (long (get state :visited 0))
            expanded       (long (get state :expanded 0))]
-      (when (Thread/interrupted) (throw (InterruptedException.)))
+      ;(when (Thread/interrupted) (throw (InterruptedException.)))
       (if-let [^Node node (s-peek queue)]
         (if (on-visit constraint node)
           (recur (s-pop! queue) contour (inc visited) expanded)
@@ -168,7 +167,7 @@
 
 (defn- IDA* [root-node goal-fn expand-fn h-fn constraint limit]
   (loop [last-result ((df-solver root-node goal-fn expand-fn h-fn constraint 0.0))]
-    (if (or (:node last-result) (> ^double (:contour last-result) ^double limit)) ; FIXME doesn't stop when contour is infinity when there is no limit!!
+    (if (or (:node last-result) (> ^number (:contour last-result) ^number limit)) ; FIXME doesn't stop when contour is infinity when there is no limit!!
       last-result
       (do (println "limit" (:contour last-result))
           (recur (merge-result last-result ((df-solver root-node goal-fn expand-fn h-fn constraint (:contour last-result)))))))))
@@ -197,7 +196,7 @@
                         (= algorithm :DF)   (general-solver (create-df-strategy) root-node goal-fn expand-fn heuristic constraint limit)
                         (= algorithm :BF)   (general-solver (create-bf-strategy) root-node goal-fn expand-fn heuristic constraint limit)
                         (= algorithm :IDA*) (IDA*-solver                         root-node goal-fn expand-fn heuristic constraint limit)
-                             :default            (throw (IllegalArgumentException.
+                             :default            (throw (js/Error.
                                                           (str "Unknown algorithm: " algorithm ", supperted are: [:A* :IDA* :DF]"))))
         function  (if all do-solve-all do-solve)]
     (function solver)))
