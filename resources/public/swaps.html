@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Shopping Calculator</title>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- shopping.html -->
+  <form id="swaps" novalidate>
+    <legend>Sort by swapping neighbours</legend>
+    <fieldset>
+
+      <div>
+        <label for="quantity">Input</label>
+        <input type="text"
+               name="input"
+               id="input"
+               value="53241"
+               required>
+      </div>
+
+      <div>
+        <label for="total">Result</label>
+        <input type="text"
+               name="result"
+               id="result"
+               value="">
+      </div>
+
+      <br><br>
+      <div>
+        <input type="button"
+               value="Solve"
+               id="solve">
+      </div>
+
+    </fieldset>
+  </form>
+  <script src="js/paad.js"></script>
+  <script>
+    paad.swaps.init();
+  </script>
+</body>
+</html>
+ 

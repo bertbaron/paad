@@ -7,7 +7,8 @@
   :source-paths ["src/clj" "src/cljs" "src/brepl"]
 
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2069"]]
+                 [org.clojure/clojurescript "0.0-2069"]
+                 [domina "1.0.3-SNAPSHOT"]]
 
   :plugins [[lein-cljsbuild "1.0.0"]]
 
