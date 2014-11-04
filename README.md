@@ -132,7 +132,7 @@ slightly more complex problems.
 
 #### using heuristics
 
-The most obvious and powerful way to reduce the search space when using A\* or IDA\* is is of course the *heuristic function*.
+The most obvious and powerful way to reduce the search space when using A\* or IDA\* is of course the *heuristic function*.
 
 For our problem an admissible heuristic could be the distance from each element to its target position,
 divided by 2, since each step will only move two elements by one position each:
