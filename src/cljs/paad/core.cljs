@@ -82,6 +82,13 @@
   (s-peek  [this])
   (s-pop!  [this]))
 
+; "An immutable strategy for depth-first and IDA* using pure clojure data structures
+(extend-type clojure.lang.IPersistentStack
+  Strategy
+  (s-conj! [this node] (conj this node))
+  (s-peek  [this] (peek this))
+  (s-pop!  [this] (pop this)))
+
 ; "An mutable strategy for depth-first and IDA*. May be more performant than immutable List or Vector."
 (extend-type java.util.ArrayList
   Strategy
@@ -101,7 +108,8 @@
     (if (= 0 on-value) (compare (.cost n2) (.cost n1)) on-value)))
 
 (defn- create-A*-strategy [] (java.util.PriorityQueue. 64 node-comparator))
-(defn- create-df-strategy [] (java.util.ArrayList.))
+;(defn- create-df-strategy [] (java.util.ArrayList.))
+(defn- create-df-strategy [] '())
 (defn- create-bf-strategy [] (java.util.LinkedList.))
 
 (defn- merge-result [old new]
