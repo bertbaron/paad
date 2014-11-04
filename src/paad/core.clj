@@ -1,5 +1,4 @@
-(ns paad.core
-  (:require primitive-math))
+(ns paad.core)
 
 (defrecord Step [operation state ^double cost])
 (def step ->Step)
