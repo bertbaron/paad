@@ -44,7 +44,7 @@
     
 (defn solve []
   (let [input (dom/value (dom/by-id "input"))]
-    (dom/set-value! (dom/by-id "result") "xyz")))
+    (dom/set-value! (dom/by-id "result") (do-solve (vec input)))))
 
 (defn ^:export init []
   (when (and js/document

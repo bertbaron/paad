@@ -20,17 +20,17 @@
 
 (defn no-return-constraint []
   (letfn [(constraint [^Node node] (when-let [parent ^Node (.parent node)]
-                                     (if (= (.state parent) (.state node))
+                                     (if (= (.-state parent) (.-state node))
                                        true
                                        (when-let [grandparent ^Node (.parent parent)]
-                                         (= (.state grandparent) (.state node))))))]
+                                         (= (.-state grandparent) (.-state node))))))]
     (fn [] (StatelessConstraint. constraint))))
 
 (defn no-loop-constraint []
-  (letfn [(constraint [^Node node] (let [state (.state node)]
+  (letfn [(constraint [^Node node] (let [state (.-state node)]
                                      (loop [n ^Node (.parent node)]
                                        (when n
-                                         (if (= state (.state n))
+                                         (if (= state (.-state n))
                                            true
                                            (recur (.parent n)))))))]
     (fn [] (StatelessConstraint. constraint))))
@@ -55,15 +55,15 @@
   Constraint
   (on-expand [_ node]
     (not (cond-update map
-                      (keyfn (.state ^Node node))
-                      [(.value ^Node node) false]
+                      (keyfn (.-state ^Node node))
+                      [(.-value ^Node node) false]
                       (fn [current nw]
                         (< ^number (nw 0) ^number (current 0))))))
 
   (on-visit [_ node]
     (not (cond-update map
-                      (keyfn (.state ^Node node))
-                      [(.value ^Node node) true]
+                      (keyfn (.-state ^Node node))
+                      [(.-value ^Node node) true]
                       (fn [current nw]
                         (or (< ^number (nw 0) ^number (current 0))
                           (and (= (nw 0) (current 0))
@@ -83,34 +83,42 @@
   (s-pop!  [this]))
 
 ; "An immutable strategy for depth-first and IDA* using pure clojure data structures
-(extend-type clojure.lang.IPersistentStack
+(extend-type cljs.core.List
+  Strategy
+  (s-conj! [this node] (conj this node))
+  (s-peek  [this] (peek this))
+  (s-pop!  [this] (pop this)))
+
+(extend-type cljs.core.EmptyList
   Strategy
   (s-conj! [this node] (conj this node))
   (s-peek  [this] (peek this))
   (s-pop!  [this] (pop this)))
 
 ; "An mutable strategy for depth-first and IDA*. May be more performant than immutable List or Vector."
-(extend-type java.util.ArrayList
-  Strategy
-  (s-conj! [this node] (.add this node) this)
-  (s-peek  [this] (if (> (.size this) 0) (.get this (dec (.size this))) nil))
-  (s-pop!  [this] (.remove this (dec (.size this))) this))
+;(extend-type java.util.ArrayList
+;  Strategy
+;  (s-conj! [this node] (.add this node) this)
+;  (s-peek  [this] (if (> (.size this) 0) (.get this (dec (.size this))) nil))
+;  (s-pop!  [this] (.remove this (dec (.size this))) this))
 
 ; "A mutable strategy, use PriorityQueue for A* and LinkedList for breadth-first"
-(extend-type java.util.Queue
-  Strategy
-  (s-conj! [this node] (.add this node) this)
-  (s-peek  [this] (.peek this))
-  (s-pop!  [this] (.poll this) this))
+;(extend-type java.util.Queue
+;  Strategy
+;  (s-conj! [this node] (.add this node) this)
+;  (s-peek  [this] (.peek this))
+;  (s-pop!  [this] (.poll this) this))
 
 (defn- node-comparator [^Node n1 ^Node n2]
-  (let [on-value (compare (.value n1) (.value n2))]
-    (if (= 0 on-value) (compare (.cost n2) (.cost n1)) on-value)))
+  (let [on-value (compare (.-value n1) (.-value n2))]
+    (if (= 0 on-value) (compare (.-cost n2) (.-cost n1)) on-value)))
 
-(defn- create-A*-strategy [] (java.util.PriorityQueue. 64 node-comparator))
+;(defn- create-A*-strategy [] (java.util.PriorityQueue. 64 node-comparator))
+(defn- create-A*-strategy [] '())
 ;(defn- create-df-strategy [] (java.util.ArrayList.))
 (defn- create-df-strategy [] '())
-(defn- create-bf-strategy [] (java.util.LinkedList.))
+;(defn- create-bf-strategy [] (java.util.LinkedList.))
+(defn- create-bf-strategy [] '())
 
 (defn- merge-result [old new]
   (merge new (apply (partial merge-with #(+ % %2)) (map #(select-keys % [:visited :expanded]) [old new]))))
@@ -128,28 +136,28 @@
     {:statistics stats :solution solution}))
 
 (defn- expand-node [^Node node h-fn ^Step step]
-  (let [new-state (.state step) #_(apply-fn (.state node) (.operation step))
-        new-cost  (+ (.cost node) (.cost step))
-        new-value (max (.value node) (+ new-cost ^number (h-fn new-state)))]
-    (Node. node new-state (.operation step) new-cost new-value)))
+  (let [new-state (.-state step) #_(apply-fn (.-state node) (.-operation step))
+        new-cost  (+ (.-cost node) (.-cost step))
+        new-value (max (.-value node) (+ new-cost ^number (h-fn new-state)))]
+    (Node. node new-state (.-operation step) new-cost new-value)))
 
 (defn- general-search [state expand-fn h-fn constraint goal-fn the-limit]
   (let [limit ^number the-limit]
     (loop [queue          (:strategy state)
-           contour        (Double/POSITIVE_INFINITY)
+           contour        Number/POSITIVE_INFINITY
            visited        (long (get state :visited 0))
            expanded       (long (get state :expanded 0))]
       ;(when (Thread/interrupted) (throw (InterruptedException.)))
       (if-let [^Node node (s-peek queue)]
         (if (on-visit constraint node)
           (recur (s-pop! queue) contour (inc visited) expanded)
-          (let [f-cost (.value node)
+          (let [f-cost (.-value node)
                 queue  (s-pop! queue)]
 ;              (when (= (rem visited 10000) 0) (println "..." f-cost))
-              (if (goal-fn (.state node))
+              (if (goal-fn (.-state node))
                 {:node node :contour contour :visited visited :expanded expanded
                  :next-solver #(general-search { :strategy queue :visited visited :expanded expanded} expand-fn h-fn constraint goal-fn limit)}
-                (let [moves (expand-fn (.state node))
+                (let [moves (expand-fn (.-state node))
                       [queue expanded contour]
                         (loop [queue    queue
                                contour  contour
@@ -159,8 +167,8 @@
                             (let [childnode ^Node (expand-node node h-fn move)]
                               (if (on-expand constraint childnode)
                                 (recur queue contour expanded (next moves))
-                                (if (> (.value childnode) limit)
-                                  (recur queue (double (min contour (.value childnode))) expanded (next moves))
+                                (if (> (.-value childnode) limit)
+                                  (recur queue (double (min contour (.-value childnode))) expanded (next moves))
                                   (recur (s-conj! queue childnode) contour (inc expanded) (next moves)))))
                             [queue expanded contour]))]
                   (recur queue (double contour) (inc visited) (long expanded))))))
@@ -196,7 +204,7 @@
 (defn solve [root-state goal-fn expand-fn & {:keys [algorithm heuristic limit constraint all]
                                              :or {algorithm  :A*
                                                   heuristic  (constantly 0.0)
-                                                  limit      Double/POSITIVE_INFINITY
+                                                  limit      Number/POSITIVE_INFINITY
                                                   constraint (no-constraint)
                                                   all        false}}]
   (let [root-node (Node. nil root-state nil 0.0 (heuristic root-state))
