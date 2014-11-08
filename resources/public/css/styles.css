@@ -19,7 +19,7 @@ fieldset div {
 
 form {
 	margin:1em;
-	width:15em;
+	width:25em;
 }
 
 label {
@@ -39,7 +39,7 @@ legend span {
 }
 input {
 	padding:0.15em;
-	width:10em;
+	width:20em;
 	border:1px solid #ddd;
 	background:#fafafa;
 	font:bold 1em arial, sans-serif;

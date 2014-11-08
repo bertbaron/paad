@@ -19,20 +19,20 @@
   (fn [] (StatelessConstraint. (constantly false))))
 
 (defn no-return-constraint []
-  (letfn [(constraint [^Node node] (when-let [parent ^Node (.parent node)]
+  (letfn [(constraint [^Node node] (when-let [parent ^Node (.-parent node)]
                                      (if (= (.-state parent) (.-state node))
                                        true
-                                       (when-let [grandparent ^Node (.parent parent)]
+                                       (when-let [grandparent ^Node (.-parent parent)]
                                          (= (.-state grandparent) (.-state node))))))]
     (fn [] (StatelessConstraint. constraint))))
 
 (defn no-loop-constraint []
   (letfn [(constraint [^Node node] (let [state (.-state node)]
-                                     (loop [n ^Node (.parent node)]
+                                     (loop [n ^Node (.-parent node)]
                                        (when n
                                          (if (= state (.-state n))
                                            true
-                                           (recur (.parent n)))))))]
+                                           (recur (.-parent n)))))))]
     (fn [] (StatelessConstraint. constraint))))
 
 (defn- concurrent-replace [^java.util.concurrent.ConcurrentMap map key old-value new-value]
@@ -83,17 +83,11 @@
   (s-pop!  [this]))
 
 ; "An immutable strategy for depth-first and IDA* using pure clojure data structures
-(extend-type cljs.core.List
+(defrecord LIFO [list]
   Strategy
-  (s-conj! [this node] (conj this node))
-  (s-peek  [this] (peek this))
-  (s-pop!  [this] (pop this)))
-
-(extend-type cljs.core.EmptyList
-  Strategy
-  (s-conj! [this node] (conj this node))
-  (s-peek  [this] (peek this))
-  (s-pop!  [this] (pop this)))
+  (s-conj! [_ node] (LIFO. (conj list node)))
+  (s-peek  [_] (peek list))
+  (s-pop!  [_] (LIFO. (pop list))))
 
 ; "An mutable strategy for depth-first and IDA*. May be more performant than immutable List or Vector."
 ;(extend-type java.util.ArrayList
@@ -114,11 +108,11 @@
     (if (= 0 on-value) (compare (.-cost n2) (.-cost n1)) on-value)))
 
 ;(defn- create-A*-strategy [] (java.util.PriorityQueue. 64 node-comparator))
-(defn- create-A*-strategy [] '())
+(defn- create-A*-strategy [] (LIFO. '()))
 ;(defn- create-df-strategy [] (java.util.ArrayList.))
-(defn- create-df-strategy [] '())
+(defn- create-df-strategy [] (LIFO. '()))
 ;(defn- create-bf-strategy [] (java.util.LinkedList.))
-(defn- create-bf-strategy [] '())
+(defn- create-bf-strategy [] (LIFO. '()))
 
 (defn- merge-result [old new]
   (merge new (apply (partial merge-with #(+ % %2)) (map #(select-keys % [:visited :expanded]) [old new]))))
@@ -147,13 +141,11 @@
            contour        Number/POSITIVE_INFINITY
            visited        (long (get state :visited 0))
            expanded       (long (get state :expanded 0))]
-      ;(when (Thread/interrupted) (throw (InterruptedException.)))
       (if-let [^Node node (s-peek queue)]
         (if (on-visit constraint node)
           (recur (s-pop! queue) contour (inc visited) expanded)
           (let [f-cost (.-value node)
                 queue  (s-pop! queue)]
-;              (when (= (rem visited 10000) 0) (println "..." f-cost))
               (if (goal-fn (.-state node))
                 {:node node :contour contour :visited visited :expanded expanded
                  :next-solver #(general-search { :strategy queue :visited visited :expanded expanded} expand-fn h-fn constraint goal-fn limit)}
@@ -185,7 +177,7 @@
   (loop [last-result ((df-solver root-node goal-fn expand-fn h-fn constraint 0.0))]
     (if (or (:node last-result) (> ^number (:contour last-result) ^number limit)) ; FIXME doesn't stop when contour is infinity when there is no limit!!
       last-result
-      (do (println "limit" (:contour last-result))
+      (do (.log js/console "limit" (:contour last-result))
           (recur (merge-result last-result ((df-solver root-node goal-fn expand-fn h-fn constraint (:contour last-result)))))))))
 
 (defn- IDA*-solver [root-node goal-fn expand-fn h-fn constraint limit]

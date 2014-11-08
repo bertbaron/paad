@@ -39,12 +39,16 @@
     (/ displacement 2)))
 
 (defn do-solve [state]
-    (:statistics (p/solve state goal? expand
-                          :heuristic heuristic)))
+  (p/solve state goal? expand
+           :algorithm :IDA*
+           :constraint (p/no-loop-constraint)
+           :heuristic heuristic))
     
 (defn solve []
-  (let [input (dom/value (dom/by-id "input"))]
-    (dom/set-value! (dom/by-id "result") (do-solve (vec input)))))
+  (let [input (dom/value (dom/by-id "input"))
+        result (do-solve (vec input))]
+    (dom/set-value! (dom/by-id "result") (str (p/get-operations result)))
+    (dom/set-value! (dom/by-id "statistics") (:statistics result))))
 
 (defn ^:export init []
   (when (and js/document
