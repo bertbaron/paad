@@ -128,7 +128,7 @@ vectors of length 5 will already show this:
 ```
     
 That seems like a huge number of nodes for such a small input. The reason is that the algorithm
-has exponential performance, and in case of A* also memory usage. Every state expands to 4 child-states.
+has exponential complexity, and in case of A* also memory usage. Every state expands to 4 child-states.
 The number of nodes at depth 10 is therefore 4^10=1048576.
 
 It is almost always necessary to reduce the size of the search tree in order to be able to solve
