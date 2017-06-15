@@ -1,4 +1,4 @@
-(defproject bertbaron/paad "0.1.1-SNAPSHOT"
+(defproject bertbaron/paad "0.1.1"
   :description "Problem solving with A* (Astar), IDA*, Depth-first etc."
   :url "https://github.com/bertbaron/paad"
   :license {:name "Eclipse Public License"
