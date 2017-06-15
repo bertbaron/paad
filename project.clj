@@ -1,4 +1,4 @@
-(defproject paad "0.1.0-SNAPSHOT"
+(defproject bertbaron/paad "0.1.0-SNAPSHOT"
   :description "Clojure library for problem solving with search algorithms like Depth-first, A* and IDA*"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

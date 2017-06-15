@@ -1,4 +1,4 @@
-(ns paad.core)
+(ns bertbaron.paad.core)
 
 (defrecord Step [operation state ^double cost])
 (def step ->Step)

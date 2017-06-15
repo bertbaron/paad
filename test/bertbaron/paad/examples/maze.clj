@@ -1,5 +1,5 @@
-(ns paad.examples.maze
-  (:require [paad.core :as p]))
+(ns bertbaron.paad.examples.maze
+  (:require [bertbaron.paad.core :as p]))
 
 (defrecord State [maze x y target])
 

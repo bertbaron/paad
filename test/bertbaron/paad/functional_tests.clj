@@ -1,7 +1,7 @@
-(ns paad.functional-tests
+(ns bertbaron.paad.functional-tests
   (:require [clojure.test :refer :all]
-            [paad.core :as p])
-  (:require [paad.examples.sliding-puzzle :as sp]))
+            [bertbaron.paad.core :as p])
+  (:require [bertbaron.paad.examples.sliding-puzzle :as sp]))
 
 (defn assert-result [cost expanded visited result]
   (is (= cost     (-> result :solution last :cost)))

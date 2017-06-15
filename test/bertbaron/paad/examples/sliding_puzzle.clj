@@ -1,5 +1,5 @@
-(ns paad.examples.sliding-puzzle
-  (:require [paad.core :as p])
+(ns bertbaron.paad.examples.sliding-puzzle
+  (:require [bertbaron.paad.core :as p])
   (:require primitive-math))
 
 (primitive-math/use-primitive-operators)

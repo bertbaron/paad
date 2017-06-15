@@ -1,5 +1,5 @@
-(ns paad.performance
-  (:require [paad.core :as p]))
+(ns bertbaron.paad.performance
+  (:require [bertbaron.paad.core :as p]))
 
 (set! *warn-on-reflection* true)
 

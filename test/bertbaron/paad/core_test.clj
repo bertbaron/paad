@@ -1,6 +1,6 @@
-(ns paad.core-test
+(ns bertbaron.paad.core-test
   (:require [clojure.test :refer :all]
-            [paad.core :refer :all]))
+            [bertbaron.paad.core :refer :all]))
 
 (set! *warn-on-reflection* true)
 

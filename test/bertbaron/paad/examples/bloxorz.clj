@@ -1,10 +1,10 @@
-(ns paad.examples.bloxorz
+(ns bertbaron.paad.examples.bloxorz
   "Solves a simplified version of the game Bloxorz (http://www.coolmath-games.com/0-bloxorz) 
    with no switches, teleport tiles or orange tiles. Theres only simple tiles, a block and a
    target hole.
    As such, the state consists only of the block position, which is simply represented as
    [[row1 col1] [row2 col2]]."
-  (:require [paad.core :as p]))
+  (:require [bertbaron.paad.core :as p]))
 
 ; terrain is a function from position to the field (i.e. :target or :tile) or nil if there is no field
 (defrecord Game [terrain startpos])

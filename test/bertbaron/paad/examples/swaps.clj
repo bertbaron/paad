@@ -1,5 +1,5 @@
-(ns paad.examples.swaps
-  (:require [paad.core :as p])
+(ns bertbaron.paad.examples.swaps
+  (:require [bertbaron.paad.core :as p])
   (:require [clojure.pprint :as pp]))
 
 ;

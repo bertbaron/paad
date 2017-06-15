@@ -1,5 +1,5 @@
-(ns paad.examples.peg-solitaire
-  (:require [paad.core :as p]))
+(ns bertbaron.paad.examples.peg-solitaire
+  (:require [bertbaron.paad.core :as p]))
 
 (set! *warn-on-reflection* true)
 
