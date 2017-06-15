@@ -8,8 +8,8 @@ As an example we will sort a vector of elements with the minimal number of swaps
 of neighboring elements:
 
 ```clojure
-(ns paad.examples.swaps
-  (:require [paad.core :as p]))
+(ns bertbaron.paad.examples.swaps
+  (:require [bertbaron.paad.core :as p]))
 
 (defn swap
   "Swaps element at index i in vector v with its right neighbour"
@@ -58,7 +58,7 @@ extract the required information is quite simple. For example, to just list the 
 
 #### A*
  
-By default *A*** is used to solve the problem. It can also explicitly be specified using
+By default *A** is used to solve the problem. It can also explicitly be specified using
 the :algorithm key:
 
 ```clojure
@@ -67,7 +67,7 @@ the :algorithm key:
 (0 2 1 2 3)   
 ```
 
-A* will find the optimal solution in the least number of visited nodes is an admissible
+A* will find the optimal solution in the least number of visited nodes if an admissible
 heuristic is provided. The *heuristic function* estimates the remaining costs to reach
 the goal for a given state. An admissible heuristic is a heuristic that never over-estimates
 the actual costs of the best solution.
@@ -233,6 +233,6 @@ Note that any constraint is respected.
 
 ## License
 
-Copyright © 2014
+Copyright © 2017
 
 Distributed under the Eclipse Public License version 1.0
