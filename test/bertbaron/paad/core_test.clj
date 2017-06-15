@@ -69,7 +69,7 @@
   (->Node nil state  nil 0 value))
 
 (deftest concurrent-replace-test
-  (let [concurrent-replace (ns-resolve 'paad.core 'concurrent-replace)
+  (let [concurrent-replace (ns-resolve 'bertbaron.paad.core 'concurrent-replace)
         map (java.util.concurrent.ConcurrentHashMap.)]
     (testing "concurrent-replace"
       (is (= true (concurrent-replace map :a nil 1)))
