@@ -2,6 +2,10 @@
 
 Clojure library for problem solving with search algorithms like Depth-first, A\* and IDA\*
 
+## Install
+
+[![Clojars Project](https://img.shields.io/clojars/v/bertbaron/paad.svg)](https://clojars.org/bertbaron/paad)
+
 ## Usage
 
 As an example we will sort a vector of elements with the minimal number of swaps
