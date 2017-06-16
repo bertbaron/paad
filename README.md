@@ -230,8 +230,8 @@ of a single result, a lazy sequence of the result is returned:
 The sequence is really lazy, the head will not be calculated until requested
 and chunking is not supported. 
 
-This option is not supported for IDA*. It it is used in combination with
-IDA*, the sequence will contain only one result.
+This option is not supported for IDA*; if used in combination with
+IDA* the sequence will contain not more than one result.
 
 Note that any constraint is respected.
 
