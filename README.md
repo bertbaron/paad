@@ -159,7 +159,7 @@ divided by 2, since each step will only move two elements by one position each:
 
 #### Using constraints
 
-The easiest way to reduce the size of the tree is by trying to see if one of the provided constraints
+The easiest way to (further) reduce the size of the tree is by trying to see if one of the provided constraints
 is suitable for the problem.
 
 ##### no-return-constraint
@@ -174,7 +174,7 @@ it cuts the branch if an operation of a state returns in the same state or in th
 {:expanded 118357, :visited 39452}
 ```
 
-This saves an order of magnitude, since every expand will now effectively result in 3 child states
+This saves an order of magnitude, since every expand will now effectively result in three child states
 instead of four. This means we should now be able to compute vectors with one more element at the
 same costs.
 
