@@ -1,5 +1,5 @@
 (defproject bertbaron/paad "0.1.2-SNAPSHOT"
-  :description "Problem solving with A* (Astar), IDA*, Depth-first etc."
+  :description "Problem solving / path finding with A* (Astar), IDA*, Depth-first etc."
   :url "https://github.com/bertbaron/paad"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
